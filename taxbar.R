@@ -8,11 +8,11 @@ taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, exclude
   library(reshape2)
   counts = read.table(taxSummaryFile, header = TRUE)
   counts = counts[counts[1]==taxLevel,]
-  rownames(counts) = counts$taxon
+  rownames(counts) = make.names(counts$taxon, unique = TRUE)
   # get rid of excess columns in mothur tax.summary file
   counts = counts[,-grep("taxon|taxlevel|rankID|daughterlevels|total", colnames(counts))]
   counts = counts[,!colnames(counts) %in% excludeSamples]
-  counts = counts[!rownames(counts) %in% excludeTaxa,]
+  counts = counts[!rownames(counts) %in% rownames(counts)[grep(paste(excludeTaxa,collapse="|"),rownames(counts))],]
   if (length(group) == 0 ) {
     group = colnames(counts)
   }
