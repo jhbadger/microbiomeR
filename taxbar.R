@@ -12,7 +12,10 @@ taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, exclude
   # get rid of excess columns in mothur tax.summary file
   counts = counts[,-grep("taxon|taxlevel|rankID|daughterlevels|total", colnames(counts))]
   counts = counts[,!colnames(counts) %in% excludeSamples]
-  counts = counts[!rownames(counts) %in% rownames(counts)[grep(paste(excludeTaxa,collapse="|"),rownames(counts))],]
+  if (length(excludeTaxa) > 0) {
+    counts = counts[!rownames(counts) %in% 
+                      rownames(counts)[grep(paste(excludeTaxa,collapse="|"),rownames(counts))],]
+  }
   if (length(group) == 0 ) {
     group = colnames(counts)
   }
