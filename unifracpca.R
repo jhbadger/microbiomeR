@@ -1,9 +1,10 @@
 # unifracpca: return scatter plot graph of unifrac distances, colored and/or shaped by a factor
 # inputs: square Unifrac distance matrixfrom Mothur, optional group factor and colors and shapes
 # to use for the various factor levels, plus an optional title string if default not appropriate
+# dist flag allows returning PCA distance matrix for inspection rather than plotting
 
 unifracpca = function(unifracDistSquare, group=c(), excludeSamples=c(), colors=c(), shapes=c(),
-                      exstring="PCA on unweighted unifrac distances") {
+                      exstring="PCA on unweighted unifrac distances", dist=FALSE) {
   library(ggplot2)
   unifrac = read.table(unifracDistSquare, skip=1, row.names = 1)
   colnames(unifrac) = rownames(unifrac)
@@ -15,6 +16,9 @@ unifracpca = function(unifracDistSquare, group=c(), excludeSamples=c(), colors=c
   d	= data.frame(id=1:nrow(scores), t(t(scores)/lambda))
   if (length(group) > 0) {
     d$group = group
+  }
+  if (dist) {
+    return(d)
   }
   plot = ggplot(d,	aes(x=PC1,	y=PC2))
   if (length(group) > 0) {
