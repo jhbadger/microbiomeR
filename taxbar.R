@@ -3,7 +3,8 @@
 # optional minimum fraction to include (default 0.05)
 # optional arrays of samples to exclude (e.g. Mock) and taxa to exclude (e.g. unclassified)
 
-taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, excludeSamples=c(), excludeTaxa=c()) {
+taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, excludeSamples=c(), 
+                  excludeTaxa=c(), addTitle = "") {
   library(ggplot2)
   library(reshape2)
   counts = read.table(taxSummaryFile, header = TRUE)
@@ -29,10 +30,14 @@ taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, exclude
   mcounts$Sample=droplevels(mcounts$Group)
   mcounts$Taxon=droplevels(mcounts$Taxon)
   names=c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+  title = paste(names[taxLevel],"abundance")
+  if (length(addTitle) > 0) {
+    title = paste(title, addTitle)
+  }
   ggplot(mcounts, aes(x = Group, y = Fraction, fill = Taxon)) + 
     geom_bar(stat = "identity") + theme(axis.text.x=element_text(size=8)) +
     theme(axis.text.x=element_text(angle=-90,hjust=0)) +
     scale_x_discrete(name="") + scale_y_continuous("Relative Abdundance") +
-    ggtitle(paste(names[taxLevel],"abundance")) +
+    ggtitle(title) +
     guides(fill=guide_legend(title="Legend"))
 }
