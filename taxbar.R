@@ -4,7 +4,7 @@
 # optional arrays of samples to exclude (e.g. Mock) and taxa to exclude (e.g. unclassified)
 
 taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, excludeSamples=c(), 
-                  excludeTaxa=c(), addTitle = "") {
+                  excludeTaxa=c(), addTitle = "", tcounts=FALSE) {
   library(ggplot2)
   library(reshape2)
   counts = read.table(taxSummaryFile, header = TRUE)
@@ -19,6 +19,9 @@ taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, exclude
   }
   if (length(group) == 0 ) {
     group = colnames(counts)
+  }
+  if (tcounts) {
+    return(counts)
   }
   # summarize by group
   counts = t(sapply(by(t(counts),group,colSums),identity))

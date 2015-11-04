@@ -6,7 +6,7 @@
 # optional correction method (default "fdr")
 
 siganova = function(taxSummaryFile, taxLevel = 2, group, excludeSamples=c(), excludeTaxa=c(), 
-                    normalize=TRUE, correction = "fdr") {
+                    normalize=TRUE, correction = "fdr", minFraction = 0.001) {
   counts = read.table(taxSummaryFile, header = TRUE)
   counts = counts[counts[1]==taxLevel,]
   rownames(counts) = make.names(counts$taxon, unique=TRUE)
@@ -33,7 +33,7 @@ siganova = function(taxSummaryFile, taxLevel = 2, group, excludeSamples=c(), exc
   pvalues=data.frame(pvalues[order(pvalues),])
   pvalues[,"fdr"]=p.adjust(p = pvalues[,1], method=correction)
   pvalues[,"fraction"] = fractions[rownames(pvalues)]
-  sig_fdr = pvalues[pvalues$fdr<0.05,]
+  sig_fdr = pvalues[pvalues$fdr<0.05 & pvalues$fraction>=minFraction,]
   colnames(sig_fdr)=c("raw pvalue", correction, "fraction")
   if (length(row.names(sig_fdr) > 0)) {
     sig_fdr
