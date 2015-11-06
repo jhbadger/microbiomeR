@@ -6,12 +6,17 @@
 # optional correction method (default "fdr")
 
 siganova = function(taxSummaryFile, taxLevel = 2, group, excludeSamples=c(), excludeTaxa=c(), 
-                    normalize=TRUE, correction = "fdr", minFraction = 0.001) {
+                    includeSamples = c(), normalize=TRUE, correction = "fdr", minFraction = 0.001) {
   counts = read.table(taxSummaryFile, header = TRUE)
   counts = counts[counts[1]==taxLevel,]
   rownames(counts) = make.names(counts$taxon, unique=TRUE)
   counts = counts[,-grep("taxon|taxlevel|rankID|daughterlevels|total", colnames(counts))]
-  counts = counts[,!colnames(counts) %in% excludeSamples]
+  if (length(includeSamples) > 0) {
+    counts = counts[,colnames(counts) %in% includeSamples] 
+  }
+  else {
+    counts = counts[,!colnames(counts) %in% excludeSamples]
+  }
   if (length(excludeTaxa) > 0) {
     counts = counts[!rownames(counts) %in% 
                       rownames(counts)[grep(paste(excludeTaxa,collapse="|"),rownames(counts))],]

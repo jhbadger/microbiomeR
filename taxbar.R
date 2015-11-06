@@ -4,7 +4,7 @@
 # optional arrays of samples to exclude (e.g. Mock) and taxa to exclude (e.g. unclassified)
 
 taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, excludeSamples=c(), 
-                  excludeTaxa=c(), addTitle = "", tcounts=FALSE) {
+                  excludeTaxa=c(), includeSamples = c(), addTitle = "", tcounts=FALSE) {
   library(ggplot2)
   library(reshape2)
   counts = read.table(taxSummaryFile, header = TRUE)
@@ -12,7 +12,12 @@ taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, exclude
   rownames(counts) = make.names(counts$taxon, unique = TRUE)
   # get rid of excess columns in mothur tax.summary file
   counts = counts[,-grep("taxon|taxlevel|rankID|daughterlevels|total", colnames(counts))]
-  counts = counts[,!colnames(counts) %in% excludeSamples]
+  if (length(includeSamples) > 0 ) {
+    counts = counts[,colnames(counts) %in% includeSamples]
+  }
+  else {
+    counts = counts[,!colnames(counts) %in% excludeSamples]
+  }
   if (length(excludeTaxa) > 0) {
     counts = counts[!rownames(counts) %in% 
                       rownames(counts)[grep(paste(excludeTaxa,collapse="|"),rownames(counts))],]

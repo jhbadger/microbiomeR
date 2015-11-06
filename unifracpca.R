@@ -4,14 +4,19 @@
 # not appropriate dist flag allows returning PCA distance matrix for inspection rather than plotting
 # also, optional use of tsne (plus parameters) instead of PCA
 
-unifracpca = function(unifracDistSquare, group=c(), excludeSamples=c(), colors=c(), shapes=c(),
-                      sizes=c(), labels = c(),
+unifracpca = function(unifracDistSquare, group=c(), excludeSamples=c(), includeSamples=c(), 
+                      colors=c(), shapes=c(), sizes=c(), labels = c(),
                       exstring="PCA on unweighted unifrac distances", dist=FALSE, tsne=FALSE,
                       tsne_iter = 1000, tsne_perplexity=4) {
   library(ggplot2)
   unifrac = read.table(unifracDistSquare, skip=1, row.names = 1)
   colnames(unifrac) = rownames(unifrac)
-  unifrac = unifrac[!colnames(unifrac) %in% excludeSamples,!colnames(unifrac) %in% excludeSamples]
+  if (length(includeSamples) > 0) {
+   unifrac = unifrac[includeSamples, ] 
+  }
+  else {
+    unifrac = unifrac[!colnames(unifrac) %in% excludeSamples,!colnames(unifrac) %in% excludeSamples]
+  }
   if (tsne) {
     library(tsne)
     d = as.data.frame(tsne(unifrac, perplexity = tsne_perplexity, max_iter = tsne_iter))
