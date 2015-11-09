@@ -56,7 +56,7 @@ unifracpca = function(unifracDistSquare, group=c(), excludeSamples=c(), includeS
     plot = plot + scale_size_manual(values=sizes, labels=levels(group)) 
   }
   if (length(labels) > 0) {
-    plot = plot + geom_text(label=labels,size=5)
+    plot = plot + geom_text(label=labels,size=3, hjust=1, vjust=1.5)
   }
   if (!tsne) {
     plot = plot + scale_x_continuous(name=paste("PC1 ",percents[1], "%", sep="")) 
