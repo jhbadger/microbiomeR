@@ -1,9 +1,8 @@
-# siganova: plot dot plot of provided taxon in respect to a group (or by sample if no group provided).
-# inputs: tax.summary file from Mothur, taxon string, group to group by
-# optional arrays of samples to exclude (e.g. Mock)
+# dotplotspecies: plot dot plot of provided taxon in respect to a group (or by sample if no group provided).
+# inputs: tax.summary file from Mothur, taxon string, group to group by, samples to include
 
-dotplotspecies = function(taxSummaryFile, taxon, group=c(), excludeSamples=c(),includeSamples=c(),
-                          normalize=TRUE) {
+dotplotspecies = function(taxSummaryFile, taxon, group=c(),includeSamples,
+                          normalize=TRUE, addTitle = "") {
   library(ggplot2)
   library(reshape2)
   counts = read.table(taxSummaryFile, header = TRUE)
@@ -11,12 +10,7 @@ dotplotspecies = function(taxSummaryFile, taxon, group=c(), excludeSamples=c(),i
   rownames(counts) = counts$taxon
   # get rid of excess columns in mothur tax.summary file
   counts = counts[,-grep("taxon|taxlevel|rankID|daughterlevels|total", colnames(counts))]
-  if (length(includeSamples) > 0 ) {
-    counts = counts[,colnames(counts) %in% includeSamples]
-  }
-  else {
-    counts = counts[,!colnames(counts) %in% excludeSamples]
-  }
+  counts = counts[,colnames(counts) %in% includeSamples]
   if (normalize) {
     counts = round((counts/rowSums(counts))*100000)
   }
@@ -29,5 +23,5 @@ dotplotspecies = function(taxSummaryFile, taxon, group=c(), excludeSamples=c(),i
   ggplot(counts,aes(x=Group,y=Value)) + geom_dotplot(binaxis = "y", stackdir = "center") +
     theme(axis.text.x=element_text(angle=-90,hjust=0)) +
     theme(legend.position="none") +scale_x_discrete(name="") + scale_y_continuous("Taxon Counts") + 
-    ggtitle(taxon)
+    ggtitle(paste(addTitle,taxon))
 }

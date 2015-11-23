@@ -1,10 +1,10 @@
 # taxbar: make bar graph of taxonomic distribution of groups of samples
-# inputs: tax.summary file from Mothur, numeric taxonomic level (1=kingdom,2=phylum, etc), group linking samples to groups
+# inputs: tax.summary file from Mothur, numeric taxonomic level (1=kingdom,2=phylum, etc), group linking samples to groups, samples to include
 # optional minimum fraction to include (default 0.05)
-# optional arrays of samples to exclude (e.g. Mock) and taxa to exclude (e.g. unclassified)
+# optional array of taxa to exclude (e.g. unclassified)
 
-taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, excludeSamples=c(), 
-                  excludeTaxa=c(), includeSamples = c(), addTitle = "", tcounts=FALSE) {
+taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, 
+                  excludeTaxa=c(), includeSamples, addTitle = "", tcounts=FALSE) {
   library(ggplot2)
   library(reshape2)
   counts = read.table(taxSummaryFile, header = TRUE)
@@ -12,12 +12,7 @@ taxbar = function(taxSummaryFile, taxLevel, group=c(), minFraction=0.05, exclude
   rownames(counts) = make.names(counts$taxon, unique = TRUE)
   # get rid of excess columns in mothur tax.summary file
   counts = counts[,-grep("taxon|taxlevel|rankID|daughterlevels|total", colnames(counts))]
-  if (length(includeSamples) > 0 ) {
-    counts = counts[,colnames(counts) %in% includeSamples]
-  }
-  else {
-    counts = counts[,!colnames(counts) %in% excludeSamples]
-  }
+  counts = counts[,colnames(counts) %in% includeSamples]
   if (length(excludeTaxa) > 0) {
     counts = counts[!rownames(counts) %in% 
                       rownames(counts)[grep(paste(excludeTaxa,collapse="|"),rownames(counts))],]
