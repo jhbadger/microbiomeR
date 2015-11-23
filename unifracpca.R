@@ -4,19 +4,15 @@
 # not appropriate dist flag allows returning PCA distance matrix for inspection rather than plotting
 # also, optional use of tsne (plus parameters) instead of PCA
 
-unifracpca = function(unifracDistSquare, group=c(), excludeSamples=c(), includeSamples=c(), 
+unifracpca = function(unifracDistSquare, includeSamples, group=c(), 
                       colors=c(), shapes=c(), sizes=c(), labels = c(),
                       exstring="PCA on unweighted unifrac distances", dist=FALSE, tsne=FALSE,
                       tsne_iter = 1000, tsne_perplexity=4) {
   library(ggplot2)
   unifrac = read.table(unifracDistSquare, skip=1, row.names = 1)
   colnames(unifrac) = rownames(unifrac)
-  if (length(includeSamples) > 0) {
-   unifrac = unifrac[includeSamples, ] 
-  }
-  else {
-    unifrac = unifrac[!colnames(unifrac) %in% excludeSamples,!colnames(unifrac) %in% excludeSamples]
-  }
+  includeSamples = as.character(includeSamples)
+  unifrac = unifrac[as.character(includeSamples), as.character(includeSamples)] 
   if (tsne) {
     library(tsne)
     d = as.data.frame(tsne(unifrac, perplexity = tsne_perplexity, max_iter = tsne_iter))
@@ -29,6 +25,7 @@ unifracpca = function(unifracDistSquare, group=c(), excludeSamples=c(), includeS
     d	= data.frame(id=1:nrow(scores), t(t(scores)/lambda))
   }
   if (length(group) > 0) {
+    group = as.character(group)
     d$group = group
   }
   if (dist) {
@@ -47,13 +44,13 @@ unifracpca = function(unifracDistSquare, group=c(), excludeSamples=c(), includeS
     plot = plot+geom_point()
   }
   if (length(colors) > 0) {
-    plot = plot + scale_color_manual(values=colors, labels=levels(group))
+    plot = plot + scale_color_manual(values=colors)
   }
   if (length(shapes) > 0) {
-    plot = plot + scale_shape_manual(values=shapes, labels=levels(group)) 
+    plot = plot + scale_shape_manual(values=shapes) 
   }
   if (length(sizes) > 0) {
-    plot = plot + scale_size_manual(values=sizes, labels=levels(group)) 
+    plot = plot + scale_size_manual(values=sizes) 
   }
   if (length(labels) > 0) {
     plot = plot + geom_text(label=labels,size=3, hjust=1, vjust=1.5)
