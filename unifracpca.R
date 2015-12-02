@@ -12,6 +12,10 @@ unifracpca = function(unifracDistSquare, includeSamples, group=c(),
   unifrac = read.table(unifracDistSquare, skip=1, row.names = 1)
   colnames(unifrac) = rownames(unifrac)
   includeSamples = as.character(includeSamples)
+  missingSamples = setdiff(includeSamples, colnames(unifrac))
+  if (length(missingSamples) > 0) {
+    return(paste("Cannot continue: The following samples are not in Unifrac matrix:", missingSamples))
+  }
   unifrac = unifrac[as.character(includeSamples), as.character(includeSamples)] 
   if (tsne) {
     library(tsne)
@@ -25,7 +29,6 @@ unifracpca = function(unifracDistSquare, includeSamples, group=c(),
     d	= data.frame(id=1:nrow(scores), t(t(scores)/lambda))
   }
   if (length(group) > 0) {
-    group = as.character(group)
     d$group = group
   }
   if (dist) {
